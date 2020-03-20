@@ -46,11 +46,11 @@ zope.interface==5.0.0
 
 Install python3.6 on your system. To check if python3.6 is already available open a terminal and type:
 ```
-which python3
+which python3.6
 ```
 It should display the current version of python3.6. If not, you need to install python3.
 
-When you have succesfully installed python3 open a terminal and install virtualenv:
+When you have succesfully installed python3.6 open a terminal and install virtualenv:
 ```
 python3.6 -m pip install virtualenv
 ```
@@ -58,7 +58,7 @@ We are about to create a virtual environment with the requirements listed above.
 ```
 cd DIRECTORY/WHERE/YOU/WANT/TO/STORE/THE/VIRTUAL/ENVIRONMENT
 ```
-Now make a virtualenv with you python3 installation:
+Now make a virtualenv with you python3.6 installation:
 ```
 virtualenv -p python3.6 gap_filling_env_py3
 ```
