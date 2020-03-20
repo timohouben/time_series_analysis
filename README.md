@@ -44,15 +44,15 @@ zope.interface==5.0.0
 
 ## Installation (for Mac)
 
-Install python3 on your system. To check if python3 is already available open a terminal and type:
+Install python3.6 on your system. To check if python3.6 is already available open a terminal and type:
 ```
 which python3
 ```
-It should display the current version of python3. If not, you need to install python3.
+It should display the current version of python3.6. If not, you need to install python3.
 
 When you have succesfully installed python3 open a terminal and install virtualenv:
 ```
-python3 -m pip install virtualenv
+python3.6 -m pip install virtualenv
 ```
 We are about to create a virtual environment with the requirements listed above. A virtual environment ensures that the script is executed always with the same versions of required packages. Change the directory to a location where you want to store the virtual environment.
 ```
@@ -60,7 +60,7 @@ cd DIRECTORY/WHERE/YOU/WANT/TO/STORE/THE/VIRTUAL/ENVIRONMENT
 ```
 Now make a virtualenv with you python3 installation:
 ```
-virtualenv -p python3 gap_filling_env_py3
+virtualenv -p python3.6 gap_filling_env_py3
 ```
 Activate this environment.
 ```
