@@ -3,6 +3,8 @@
 Script to fill gaps in time series.
 Written: March 2020, Timo Houben
 
+version 1.0.0
+
 Parameter
 ---------
 
@@ -12,7 +14,7 @@ path : string
 Yields
 ------
 
-A folder called "result" with subfolders:
+A folder called "time_series_TIME_NOW" with subfolders:
     - plots: plots for every time series and the interpolation
     - output: interpolated time series with different methods
     - log: file containing information about the input time series
