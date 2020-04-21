@@ -7,6 +7,7 @@ version 0.0.1
 
 Adjust some parameters manually:
     header_length in line 143
+    interpolation from line 156 onwards, use a # to comment out the methods
 
 Parameter
 ---------
