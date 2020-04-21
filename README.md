@@ -1,45 +1,16 @@
-# time_series_gap_filling.py
-Script to fill gaps in time series and interpolate with different methods.
-This script is tailored to the following file type:
-
-```
-6335820  ID from GRDC discharge database; (Abfluss) DAILY
-nodata   -9999.000
-n       1 measurement per day [1, 1440]
-start   1951 01 01 00 00 (YYYY MM DD HH MM)
-end     2017 12 31 00 00 (YYYY MM DD HH MM)
-1985 11 03 00 00       1.060
-1985 11 04 00 00       0.826
-1985 11 05 00 00       1.380
-1985 11 06 00 00       3.230
-1985 11 07 00 00       1.250
-1985 11 08 00 00       1.200
-1985 11 09 00 00       1.560
-1985 11 10 00 00       2.390
-1985 11 11 00 00       1.640
-1985 11 12 00 00       1.230
-        .                .
-        .                .
-        .                .
-```
+Scripts to fill gaps in time series and interpolate with different methods.
+Both scripts are tailored to different file types. Please read the header of the corresponding file.
 
 ## Requirements
 
 Python3.6.4
 
 ```
-cycler==0.10.0
 DateTime==4.3
-kiwisolver==1.1.0
 matplotlib==3.2.1
 numpy==1.18.2
 pandas==1.0.3
-pyparsing==2.4.6
-python-dateutil==2.8.1
-pytz==2019.3
 scipy==1.4.1
-six==1.14.0
-zope.interface==5.0.0
 ```
 
 ## Installation (for Mac)
@@ -84,7 +55,7 @@ cd DIRECTORY/SAVE/SCRIPT
 ```
 Download the script:
 ```
-curl -O https://github.com/timohouben/time_series_analysis/blob/master/time_series_gap_filling.py
+curl -O https://github.com/timohouben/time_series_analysis/blob/master/TheScriptYouWantToDownload.py
 ```
 
 # Run
@@ -96,5 +67,5 @@ source PATH/TO/THE/ENVIRONEMNT/bin/activate
 ```
 Run the script:
 ```
-python3 time_series_gap_filling.py PATH/TO/SOURCE/FILES
+python3 TheScriptYouWantToRun.py PATH/TO/SOURCE/FILES
 ```

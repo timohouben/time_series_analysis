@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Script to fill gaps in time series.
-Written: March 2020, Timo Houben
+Script to fill gaps in monthly time series.
+Written: April 2020, Timo Houben
 
-version 1.0.0
+version 0.0.1
+
+Adjust some parameters manually:
+    header_length in line 143
 
 Parameter
 ---------
@@ -21,22 +24,54 @@ A folder called "time_series_TIME_NOW" with subfolders:
 
 This script is tailored to the following file type:
 
-6335820  ID from GRDC discharge database; (Abfluss) DAILY
-nodata   -9999.000
-n       1 measurement per day [1, 1440]
-start   1951 01 01 00 00 (YYYY MM DD HH MM)
-end     2017 12 31 00 00 (YYYY MM DD HH MM)
-1951 01 01 00 00       1.290
-1951 01 02 00 00       1.140
-1951 01 03 00 00       1.090
-1951 01 04 00 00       1.090
-1951 01 05 00 00       1.090
-1951 01 06 00 00       1.180
-1951 01 07 00 00       1.230
-1951 01 08 00 00       1.720
-1951 01 09 00 00       1.670
-1951 01 10 00 00       1.280
-1951 01 11 00 00       1.180
+# Title:                 GRDC STATION DATA FILE
+#                        --------------
+# Format:                DOS-ASCII
+# Field delimiter:       ;
+# missing values are indicated by -999.000
+#
+# file generation date:  2020-04-01
+#
+# GRDC-No.:              6972830
+# River:                 SHOMBA
+# Station:               SHOMBA
+# Country:               RU
+# Latitude (DD):       65.1
+# Longitude (DD):      33.1
+# Catchment area (km�):      1030.0
+# Altitude (m ASL):        -999.00
+# Next downstream station:      6972802
+# Remarks:
+# Owner of original data: Initial dataset collected in the framework of the First GARP Global Experiment (FGGE)
+#************************************************************
+#
+# Data Set Content:      MEAN MONTHLY DISCHARGE (MQ)
+#                        --------------------
+# Unit of measure:                  m�/s
+# Time series:           1951 - 1987
+# No. of years:          37
+# Last update:           2018-05-28
+#
+# Table Header:
+#     YYYY-MM-DD - Date (DD=00)
+#     hh:mm      - Time
+#     Original   - original (provided) data
+#     Calculated - GRDC calculated from daily data
+#     Flag       - percentage of valid values used for calculation from daily data
+#************************************************************
+#
+# Data lines: 441
+# DATA
+YYYY-MM-DD;hh:mm; Original; Calculated; Flag
+1951-01-01;--:--;      2.030;   -999.000;   0
+1951-02-01;--:--;      1.680;   -999.000;   0
+1951-03-01;--:--;      1.620;   -999.000;   0
+1951-04-01;--:--;      4.860;   -999.000;   0
+1951-05-01;--:--;     42.000;   -999.000;   0
+1951-06-01;--:--;     19.700;   -999.000;   0
+1951-07-01;--:--;     12.600;   -999.000;   0
+1951-08-01;--:--;      6.580;   -999.000;   0
+1951-09-01;--:--;      3.000;   -999.000;   0
 """
 ###############################################################################
 # module import
@@ -95,8 +130,15 @@ print(
 # The following variables can be adjusted according to the needs
 ###############################################################################
 # specifiy the number of lines of the header
-header_length = 5
+header_length = 39
 no_data_value = [
+    -999,
+    -999.0,
+    -999.00,
+    -999.000,
+    -999.0000,
+    -999.00000,
+    -999.000000,
     -9999,
     -9999.0,
     -9999.00,
@@ -123,7 +165,6 @@ interpolation = [
 ###############################################################################
 # script starts here
 ###############################################################################
-
 # how many files
 n_files = len(listdir)
 
@@ -142,20 +183,20 @@ for index, filepath in enumerate(listdir):
     dateobj_list = []
     value_list = []
 
-    with open(os.path.join(path, filename)) as file:
+    # opening file in binary mode to circumvent problems with non asci characters in the heading
+    with open(os.path.join(path, filename), 'rb') as file:
         for line in islice(file, header_length, None):
             # split the line with spacings
-            line_split = line.split()
-            # combine first 3 entries to the date
-            datestr = "-".join(line_split[0:3])
+            line_split = line.split(b';')
             try:
-                dateobj = datetime.strptime(datestr, "%Y-%m-%d")
+                # decode byte entries in utf-8 to strings
+                dateobj = datetime.strptime(line_split[0].decode('utf-8'), "%Y-%m-%d")
             except ValueError("Skipping line " + line + " due to wrong format."):
                 break
             dateobj_list.append(dateobj)
             # assign value
-            value = line_split[-1]
-            value_list.append(value)
+            value = line_split[-3]
+            value_list.append(value.decode('utf-8'))
 
     # make pandas df from dict
     timeseries_df = pd.DataFrame()
@@ -165,7 +206,6 @@ for index, filepath in enumerate(listdir):
     timeseries_df.value = timeseries_df.value.astype("float64")
     # no data values with nans
     timeseries_df = timeseries_df.replace(no_data_value, np.nan)
-
     # function to identify gaps and Nans and interpolate with different methds
     # set start and end and delta in days
     start = timeseries_df.date.min()
@@ -221,7 +261,7 @@ for index, filepath in enumerate(listdir):
         timeseries_interp = timeseries_df_new.interpolate(method=method, inplace=False)
         timeseries_interp.to_csv(
             os.path.join(
-                dirname, result_folder, "data", filename[:-4] + "_" + method + ".txt"
+                dirname, result_folder, "data", filename[:-4] + "_" + method + "_daily.txt"
             ),
             columns=["date", "value"],
             header=False,
@@ -229,6 +269,20 @@ for index, filepath in enumerate(listdir):
             index=False,
             na_rep=np.nan
         )
+
+        # keep only the first value of every month
+        timeseries_interp_month = timeseries_interp[timeseries_interp["date"].dt.day == 1]
+        timeseries_interp_month.to_csv(
+            os.path.join(
+                dirname, result_folder, "data", filename[:-4] + "_" + method + "_monthly.txt"
+            ),
+            columns=["date", "value"],
+            header=False,
+            sep=" ",
+            index=False,
+            na_rep=np.nan
+        )
+
         plt.plot(
             timeseries_interp.date,
             timeseries_interp.value,
@@ -236,14 +290,15 @@ for index, filepath in enumerate(listdir):
             linestyle=" ",
             label=method,
         )
-    plt.plot(timeseries_df.date, timeseries_df.value, marker=".", linestyle=" ")
+
+    plt.plot(timeseries_df.date, timeseries_df.value, marker=".", linestyle=" ", label="data")
     x_vlines = timeseries_df_new.date[timeseries_df_new.value.isna()].tolist()
 
     min_vlines = (
         timeseries_df_new.value.max()
         - (timeseries_df_new.value.max() - timeseries_df_new.value.min()) * 0.2
     )
-    plt.vlines(x=x_vlines, ymin=min_vlines, ymax=timeseries_df_new.value.max())
+    plt.vlines(x=x_vlines, ymin=min_vlines, ymax=timeseries_df_new.value.max(), label="no data")
     plt.xticks(rotation=0)
     plt.ylabel("value")
     plt.xlabel("date")
